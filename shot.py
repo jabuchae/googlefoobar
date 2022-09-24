@@ -19,7 +19,6 @@ def solution(room, me, enemy, max_distance):
     enemy_me_slope = slope(enemy, me)
 
     def translate(pos, room_number_x, room_number_y):
-
         x = pos[0] 
         x_missing = room_x - x
         x_displacement = x if room_number_x % 2 == 0 else x_missing
@@ -42,39 +41,13 @@ def solution(room, me, enemy, max_distance):
         if room_num_y == 0:
             return enemy_pos[1] == me[1]
 
-        step_x = 1 if room_num_x < 0 else -1
-        step_y = 1 if room_num_y < 0 else -1
-
-        iterate_x = room_num_x
-        shot_slope = slope(enemy_pos, me)
-        while iterate_x != 0:
-            iterate_y = room_num_y
-            while iterate_y != 0:
-                me_pos = translate(me, iterate_x, iterate_y)
-                me_slope = slope(me_pos, me)
-                if shot_slope == me_slope:
-                    return True
-                
-                if iterate_x != room_num_x or iterate_y != room_num_y:                
-                    enemy_pos_iterate = translate(enemy, iterate_x, iterate_y)
-                    enemy_slope = slope(enemy_pos_iterate, me)
-                    if shot_slope == enemy_slope:
-                        return True
-
-                iterate_y += step_y
-            iterate_x += step_x
+        if room_num_y == room_num_x:
+            return slope([room_x, room_y], me) == slope(enemy, me)
 
         return False
 
-    max_rooms_x = int(max_distance/room_x)+2
-    max_rooms_y = int(max_distance/room_y)+2
-
-    while out_of_range(translate(enemy, max_rooms_x, 0)):
-        max_rooms_x -= 1
-    while out_of_range(translate(enemy, max_rooms_y, 0)):
-        max_rooms_y -= 1
-    max_rooms_x+=2
-    max_rooms_y+=2
+    max_rooms_x = int(max_distance/room_x)+1
+    max_rooms_y = int(max_distance/room_y)+1
 
     shots = 0
     
