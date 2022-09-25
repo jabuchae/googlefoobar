@@ -37,29 +37,37 @@ def solution(room, me, enemy, max_distance):
         enemy_pos = translate(enemy, room_num_x, room_num_y)
         enemy_slope = slope(enemy_pos, me)
 
-        corners = []
+        blockers = []
         x_i = 0
         x_step = 1 if room_num_x >= 0 else -1
         y_step = 1 if room_num_y >= 0 else -1
         while abs(x_i) <= abs(room_num_x):
             y_i = 0
             while abs(y_i) <= abs(room_num_y):
-                corners.append([room_x * x_i, room_y * y_i])
-                if room_x < room_num_x or room_y < room_num_y:
+                corner = [room_x * x_i, room_y * y_i]
+                if not out_of_range(corner):
+                    # corners
+                    blockers.append(corner)
+                if abs(x_i) < abs(room_num_x) or abs(y_i) < abs(room_num_y):
                     e = translate(enemy, x_i, y_i)
                     if not out_of_range(e):
-                        corners.append(e)
+                        # enemies in the way
+                        blockers.append(e)
+                
                 e = translate(me, x_i, y_i)
                 if not out_of_range(e):
-                    corners.append(e)
+                    # me being in the way
+                    blockers.append(e)
                 y_i += y_step
             x_i += x_step
-        slopes = map(lambda x: slope(x, me), corners)
+        slopes = map(lambda x: slope(x, me), blockers)
         
         if enemy_slope in slopes:
             return False
         
-        return not out_of_range(enemy_pos)
+        res = not out_of_range(enemy_pos)
+        
+        return res
 
     if out_of_range(enemy):
         return 0
@@ -81,6 +89,6 @@ def solution(room, me, enemy, max_distance):
     return shots
 
 if __name__=='__main__':
-    print(solution([3,2], [1,1], [2,1], 4))
-    print(solution([300,275], [150,150], [185,100], 500))
-    
+    #print(solution([3,2], [1,1], [2,1], 4))
+    #print(solution([300,275], [150,150], [185,100], 500))
+    print(solution([4,4], [1,1], [3,3], 5.66))    
