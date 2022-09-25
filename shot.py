@@ -16,8 +16,6 @@ def solution(room, me, enemy, max_distance):
             return None
         return float((p2[1]-p1[1])) / float((p2[0]-p1[0]))
 
-    enemy_me_slope = slope(enemy, me)
-
     def translate(pos, room_number_x, room_number_y):
         x = pos[0] 
         x_missing = room_x - x
@@ -31,31 +29,31 @@ def solution(room, me, enemy, max_distance):
 
         return [new_room_x, new_room_y]
 
-    def hits_me_first(room_num_x, room_num_y):
-        if room_num_x == 0 and room_num_y == 0:
-            return False
-        
-        if room_num_x == 0:
-            return enemy[0] == me[0]
-        
-        if room_num_y == 0:
-            return enemy[1] == me[1]
-
-        if room_num_y == room_num_x:
-            return slope([room_x, room_y], me) == slope(enemy, me)
-
-        return False
-
     def hits(room_num_x, room_num_y):
+        if room_num_x == 0 and room_num_y ==0:
+            return True
         enemy_pos = translate(enemy, room_num_x, room_num_y)
-        if hits_me_first(room_num_x, room_num_y):
+        enemy_slope = slope(enemy_pos, me)
+
+        corners = []
+        x_i = 0
+        x_step = 1 if room_num_x >= 0 else -1
+        y_step = 1 if room_num_y >= 0 else -1
+        while abs(x_i) <= abs(room_num_x)+1:
+            y_i = 0
+            while abs(y_i) <= abs(room_num_y)+1:
+                corners.append([room_x * x_i, room_y * y_i])
+                y_i += y_step
+            x_i += x_step
+        slopes = list(map(lambda x: slope(x, me), corners))
+        if enemy_slope in slopes:
             return False
         return not out_of_range(enemy_pos)
 
-    max_rooms_x = int(max_distance/room_x)+1
-    max_rooms_y = int(max_distance/room_y)+1
-
-    shots = 0
+    if out_of_range(enemy):
+        return 0
+    max_rooms_x = int(max_distance/room_x)+3
+    max_rooms_y = int(max_distance/room_y)+3
     
     v_aligned = me[0] == enemy[0]
     h_aligned = me[1] == enemy[1]
@@ -70,9 +68,13 @@ def solution(room, me, enemy, max_distance):
     lower_right_fix = 1 if lower_right_aligned else 0
     lower_left_fix = 1 if lower_left_aligned else 0
 
+    shots = 0
+
     room_num_x = 1
+    max_room_y = max_rooms_y
+    min_room_y = -max_rooms_y
     while room_num_x <= max_rooms_x:
-        room_num_y = max_rooms_y
+        room_num_y = max_room_y
         while room_num_y >= 0:
             if hits(room_num_x, room_num_y):
                 shots += room_num_y + h_fix
@@ -80,8 +82,9 @@ def solution(room, me, enemy, max_distance):
                     shots -= upper_right_fix
                 break
             room_num_y -= 1
+            max_room_y -= 1
 
-        room_num_y = -max_rooms_y
+        room_num_y = min_room_y
         while room_num_y < 0:
             if hits(room_num_x, room_num_y):
                 shots += -room_num_y
@@ -89,12 +92,15 @@ def solution(room, me, enemy, max_distance):
                     shots -= lower_right_fix
                 break
             room_num_y += 1
+            min_room_y += 1
 
         room_num_x += 1
     
     room_num_x = -1
+    max_room_y = max_rooms_y
+    min_room_y = -max_rooms_y
     while room_num_x >= -max_rooms_x:
-        room_num_y = max_rooms_y
+        room_num_y = max_room_y
         while room_num_y >= 0:
             if hits(room_num_x, room_num_y):
                 shots += room_num_y + h_fix
@@ -102,8 +108,9 @@ def solution(room, me, enemy, max_distance):
                     shots -= upper_left_fix
                 break
             room_num_y -= 1
+            max_room_y -= 1
 
-        room_num_y = -max_rooms_y
+        room_num_y = min_room_y
         while room_num_y < 0:
             if hits(room_num_x, room_num_y):
                 shots += -room_num_y
@@ -111,6 +118,7 @@ def solution(room, me, enemy, max_distance):
                     shots -= lower_left_fix
                 break
             room_num_y += 1
+            min_room_y += 1
 
         room_num_x -= 1
 
@@ -120,8 +128,6 @@ def solution(room, me, enemy, max_distance):
         while room_num_y >= 0:
             if hits(room_num_x, room_num_y):
                 shots += room_num_y + h_fix
-                if room_num_y >= room_num_x:
-                    shots -= upper_right_fix
                 break
             room_num_y -= 1
 
@@ -129,18 +135,16 @@ def solution(room, me, enemy, max_distance):
         while room_num_y < 0:
             if hits(room_num_x, room_num_y):
                 shots += -room_num_y
-                if -room_num_y >= room_num_x:
-                    shots -= lower_right_fix
                 break
             room_num_y += 1
 
-    if h_aligned and hits(0,0):
+    if h_aligned:
         shots += 1
-    if v_aligned and hits(0,0):
+    if v_aligned:
         shots += 1
     return shots
 
 if __name__=='__main__':
-    print(solution([3,2], [1,1], [2,1], 4))
+    print(solution([3,3], [1,1], [2,2], 4))
     print(solution([300,275], [150,150], [185,100], 500))
-
+    
