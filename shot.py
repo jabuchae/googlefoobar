@@ -44,10 +44,16 @@ def solution(room, me, enemy, max_distance):
         while abs(x_i) <= abs(room_num_x):
             y_i = 0
             while abs(y_i) <= abs(room_num_y):
-                corner = [room_x * x_i, room_y * y_i]
-                if not out_of_range(corner):
-                    # corners
-                    blockers.append(corner)
+                corners = [
+                    [room_x * x_i, room_y * y_i],
+                    [room_x * x_i + room_x, room_y * y_i],
+                    [room_x * x_i, room_y * y_i + room_y],
+                    [room_x * x_i+ room_x, room_y * y_i + room_y],
+                ]
+                for corner in corners:
+                    if not out_of_range(corner):
+                        # corners
+                        blockers.append(corner)
                 if abs(x_i) < abs(room_num_x) or abs(y_i) < abs(room_num_y):
                     e = translate(enemy, x_i, y_i)
                     if not out_of_range(e):
@@ -89,6 +95,6 @@ def solution(room, me, enemy, max_distance):
     return shots
 
 if __name__=='__main__':
-    #print(solution([3,2], [1,1], [2,1], 4))
-    #print(solution([300,275], [150,150], [185,100], 500))
+    print(solution([3,2], [1,1], [2,1], 4))
+    print(solution([300,275], [150,150], [185,100], 500))
     print(solution([4,4], [1,1], [3,3], 5.66))    
