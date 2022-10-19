@@ -1,14 +1,21 @@
+saved_combinations = {}
 def solution(w, h, tokens):        
-    saved_combinations = {}
+    
     def combinations(slots, items):
-        if slots == 1:
-            return [[items]]
-        if items == 0:
-            return [[0 for _ in range(slots)]]
 
         comb_key = str(slots) + '-' + str(items)
         if comb_key in saved_combinations:
             return saved_combinations[comb_key]
+
+        if slots == 1:
+            ret = [[items]]
+            saved_combinations[comb_key] = ret
+            return ret
+        if items == 0:
+            ret = [[0 for _ in range(slots)]]
+            saved_combinations[comb_key] = ret
+            return ret
+
 
         res_combinations = []
         for i in range(items+1):
@@ -102,5 +109,6 @@ def solution(w, h, tokens):
 
 
 if __name__ == '__main__':
-    print(solution(2, 2, 2))
-    print(solution(2, 3, 4))
+    #print(solution(2, 2, 2))
+    #print(solution(2, 3, 4))
+    print(solution(2, 2, 20))
